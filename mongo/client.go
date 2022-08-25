@@ -150,6 +150,10 @@ func NewClient(opts ...*options.ClientOptions) (*Client, error) {
 	return client, nil
 }
 
+func (c *Client) GetScoketInAlive() int {
+	return topology.MonitorPool.GetInUseConnect()
+}
+
 // Connect initializes the Client by starting background monitoring goroutines.
 // If the Client was created using the NewClient function, this method must be called before a Client can be used.
 //

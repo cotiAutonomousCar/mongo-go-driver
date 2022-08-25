@@ -42,6 +42,8 @@ var ErrWrongPool = PoolError("connection does not belong to this pool")
 // PoolError is an error returned from a Pool method.
 type PoolError string
 
+var MonitorPool *pool
+
 func (pe PoolError) Error() string { return string(pe) }
 
 // poolClearedError is an error returned when the connection pool is cleared or currently paused. It
@@ -119,6 +121,10 @@ type pool struct {
 	idleMu       sync.Mutex    // idleMu guards idleConns, idleConnWait
 	idleConns    []*connection // idleConns holds all idle connections.
 	idleConnWait wantConnQueue // idleConnWait holds all wantConn requests for idle connections.
+}
+
+func (p *pool) GetInUseConnect() int {
+	return len(p.conns)
 }
 
 // getState returns the current state of the pool. Callers must not hold the stateMu lock.
@@ -213,6 +219,7 @@ func newPool(config poolConfig, connOpts ...ConnectionOption) *pool {
 		})
 	}
 
+	MonitorPool = pool
 	return pool
 }
 
